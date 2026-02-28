@@ -74,7 +74,9 @@ customElements.whenDefined('card-tools').then(() => {
             this.showLeaveHome = config.showLeaveHome !== undefined ? !!(config.showLeaveHome) : true;
             this.municipality = config.municipality || 'Göteborg';
             this.filterMunicipality = config.filterMunicipality !== undefined ? !!(config.filterMunicipality) : false;
-            this.stringsToFilter = config.stringsToFilter != null && Array.isArray(config.stringsToFilter) ? config.stringsToFilter : [];
+            this.stringsToFilter = config.stringsToFilter != null && Array.isArray(config.stringsToFilter)
+                ? Array.from(config.stringsToFilter)
+                : [];
             if (!!(config.filterMunicipality)) {
                 this.stringsToFilter.push(', ' + this.municipality);
             }
