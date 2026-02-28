@@ -157,6 +157,7 @@ customElements.whenDefined('card-tools').then(() => {
         }
 
         _prettifyAttribute(attribute) {
+            if (attribute == null) return attribute;
             let result = attribute;
 
             for (const s of this.stringsToFilter) {
