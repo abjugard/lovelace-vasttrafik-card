@@ -73,6 +73,12 @@ customElements.whenDefined('card-tools').then(() => {
             this.showDir = config.showDir !== undefined ? !!(config.showDir) : false;
             this.showLeaveHome = config.showLeaveHome !== undefined ? !!(config.showLeaveHome) : true;
             this.municipality = config.municipality || 'Göteborg';
+            this.filterMunicipality = config.filterMunicipality !== undefined ? !!(config.filterMunicipality) : false;
+            this.stringsToFilter = config.stringsToFilter != null && Array.isArray(config.stringsToFilter) ? config.stringsToFilter : [];
+            if (!!(config.filterMunicipality)) {
+                this.stringsToFilter.push(', ' + this.municipality);
+            }
+            this.leaveHomeSuffix = config.leaveHomeSuffix != null ? config.leaveHomeSuffix : ' minutes';
             this.userDefinedLanguage = config.language;
             this.entities = this._parseEntities(config.entities);
             this.config = config;
@@ -148,8 +154,31 @@ customElements.whenDefined('card-tools').then(() => {
             return hassEntities;
         }
 
+        _prettifyAttribute(attribute) {
+            let result = attribute;
+
+            for (const s of this.stringsToFilter) {
+                result = result.replaceAll(s, "");
+            }
+
+            return result;
+        }
+
+        _prettifyAttributes(attributes) {
+            if (!(this.filterMunicipality || this.stringsToFilter.length === 0)) {
+                return attributes;
+            }
+
+            const newAttributes = Object.assign({}, attributes);
+            newAttributes.from = this._prettifyAttribute(attributes.from);
+            newAttributes.to = this._prettifyAttribute(attributes.to);
+            newAttributes.direction = this._prettifyAttribute(attributes.direction);
+
+            return newAttributes;
+        }
+
         _renderEntity(hassEntity) {
-            const attributes = hassEntity.attributes;
+            const attributes = this._prettifyAttributes(hassEntity.attributes);
 
             // Skip rendering if the line is empty or undefined
             if (!attributes.line) {
@@ -170,7 +199,7 @@ customElements.whenDefined('card-tools').then(() => {
                             ${this.showFrom ? ct.LitHtml`<td>${from}</td>` : ''}
                             ${this.showTo ? ct.LitHtml`<td>${heading}</td>` : ''}
                             ${this.showDir ? ct.LitHtml`<td>${direction}</td>` : ''}
-                            ${this.showLeaveHome ? ct.LitHtml`<td>${timeUntilLeave} minutes</td>` : ''}
+                            ${this.showLeaveHome ? ct.LitHtml`<td>${timeUntilLeave}${this.leaveHomeSuffix}</td>` : ''}
                         </tr>`;
             }
         }
